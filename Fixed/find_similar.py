@@ -16,34 +16,32 @@ def calculate_points(user_film: dict, comparing_film: dict) -> int:
 
 
 def get_recomendations(user_film: dict, films: dict[dict], top: int = 8) -> list[str]:
-    rating = {comparing_film['original_title']: calculate_points(user_film, comparing_film)
-              for comparing_film in films
-              if comparing_film != user_film}
-    rating = dict(sorted(rating.items(), key=lambda f: f[1], reverse=True))
-    return list(rating.keys())[:top]
+    ratings = {comparing_film['original_title']: calculate_points(user_film, comparing_film)
+               for comparing_film in films
+               if comparing_film != user_film}
+    ratings = dict(sorted(ratings.items(), key=lambda rating: rating[1], reverse=True))
+    return list(ratings.keys())[:top]
 
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument("--db",
+    parser.add_argument("--FilmsDB",
+                        dest="db_file",
                         default="films_db.json",
                         help="Путь к файлу с базой фильмов. По умолчанию films_db.json")
     args = parser.parse_args()
 
-    with open(args.db, encoding='utf-8') as file:
+    with open(args.db_file, encoding='utf-8') as file:
         films = json.load(file)
 
-    keyword = input("Enter film to search for: ")
-    for film in films:
-        if keyword == film['original_title']:
-            user_film = film
-            break
-    else:
+    desired_title = input("Enter film to search for: ")
+    user_film = next((filter(lambda film: film["original_title"] == desired_title, films)), None)
+    if not user_film:
         print('No such film in FilmsDB')
         return
 
-    recommendation = get_recomendations(user_film, films)
-    for film in sorted(recommendation):
+    recommendations = get_recomendations(user_film, films)
+    for film in sorted(recommendations):
         print(film)
 
 
