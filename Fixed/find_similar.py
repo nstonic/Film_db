@@ -15,7 +15,7 @@ def calculate_points(user_film: dict, comparing_film: dict) -> int:
                if comparing_film[param] == user_film[param])
 
 
-def get_recomendations(user_film: dict, films: dict[dict], top: int = 8) -> list[str]:
+def get_recommendations(user_film: dict, films: dict[dict], top: int = 8) -> list[str]:
     ratings = {comparing_film['original_title']: calculate_points(user_film, comparing_film)
                for comparing_film in films
                if comparing_film != user_film}
@@ -27,8 +27,8 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("--FilmsDB",
                         dest="db_file",
-                        default="films_db.json",
-                        help="Путь к файлу с базой фильмов. По умолчанию films_db.json")
+                        default="MyFilmDB.json",
+                        help="Путь к файлу с базой фильмов. По умолчанию MyFilmDB.json")
     args = parser.parse_args()
 
     with open(args.db_file, encoding='utf-8') as file:
@@ -40,7 +40,7 @@ def main():
         print('No such film in FilmsDB')
         return
 
-    recommendations = get_recomendations(user_film, films)
+    recommendations = get_recommendations(user_film, films)
     for film in sorted(recommendations):
         print(film)
 
