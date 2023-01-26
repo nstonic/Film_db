@@ -1,56 +1,51 @@
-from own_db_helpers import load_data
-from collections import OrderedDict
+import json
+
 from argparse import ArgumentParser
 
 
-def find_my_film(keyword, films_data):
-    for film in films_data:
-        if keyword == film['original_title']:
-            return film
-    return None
-
-
-def get_rating(my_film, films_data, num_to_recommend=8):
-    params = {
+def calculate_points(user_film: dict, comparing_film: dict) -> int:
+    param_points = {
         'belongs_to_collection': 1000,
         'original_language': 300,
         'budget': 100,
         'genres': 500
     }
-    rating = {}
-    for film in films_data:
-        film_rate = 0
-        for parameter in params:
-            if film[parameter] == my_film[parameter]:
-                film_rate += params[parameter]
-        rating[film['original_title']] = film_rate
-    del rating[my_film['original_title']]
-    rating = OrderedDict(sorted(rating.items(), key=lambda t: t[1], reverse=True))
-    final_recommendation = []
-    for film in rating:
-        if len(final_recommendation) > num_to_recommend:
+    return sum(param_points[param]
+               for param in param_points
+               if comparing_film[param] == user_film[param])
+
+
+def get_recomendations(user_film: dict, films: dict[dict], top: int = 8) -> list[str]:
+    rating = {comparing_film['original_title']: calculate_points(user_film, comparing_film)
+              for comparing_film in films
+              if comparing_film != user_film}
+    rating = dict(sorted(rating.items(), key=lambda f: f[1], reverse=True))
+    return list(rating.keys())[:top]
+
+
+def main():
+    parser = ArgumentParser()
+    parser.add_argument("--db",
+                        default="films_db.json",
+                        help="Путь к файлу с базой фильмов. По умолчанию films_db.json")
+    args = parser.parse_args()
+
+    with open(args.db, encoding='utf-8') as file:
+        films = json.load(file)
+
+    keyword = input("Enter film to search for: ")
+    for film in films:
+        if keyword == film['original_title']:
+            user_film = film
             break
-        final_recommendation.append(film)
-    return final_recommendation
+    else:
+        print('No such film in FilmsDB')
+        return
+
+    recommendation = get_recomendations(user_film, films)
+    for film in sorted(recommendation):
+        print(film)
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument("--db",
-                        default="film_db.json",
-                        help="Путь к файлу с базой фильмов, По умолчанию film_db.json")
-    args = parser.parse_args()
-
-    path = input('Enter path to DataBase:')
-    films_data = load_data(path)
-    if not films_data:
-        print('File not found, sorry...')
-        raise SystemExit
-    keyword = input('Enter film to search for:')
-    my_film = find_my_film(keyword, films_data)
-    if not my_film:
-        print('No such film in FilmsDB')
-        raise SystemExit
-    recommendation = get_rating(my_film, films_data)
-    for film in sorted(recommendation):
-        print(film)
+    main()
