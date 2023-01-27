@@ -34,11 +34,11 @@ def main():
     parser.add_argument("--FilmsDB",
                         dest="db_file",
                         default="MyFilmDB.json",
-                        help="Путь к файлу с базой фильмов. По умолчанию MyFilmDB.json")
+                        help="Path to the movie database file. By default - MyFilmDB.json")
     parser.add_argument("--top",
                         type=int,
                         default=8,
-                        help="Сколько рекомендаций вывести. Поумолчанию 8")
+                        help="Number of recommendations to output. By default - 8")
     args = parser.parse_args()
 
     with open(args.db_file, encoding='utf-8') as file:
