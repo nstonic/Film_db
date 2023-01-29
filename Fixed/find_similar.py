@@ -34,21 +34,21 @@ def main():
     parser.add_argument("--FilmsDB",
                         dest="db_file",
                         default="MyFilmDB.json",
-                        help="Path to the movie database file. By default - MyFilmDB.json")
+                        help="The path to the movie database file. By default is MyFilmDB.json")
     parser.add_argument("--top",
                         type=int,
                         default=8,
-                        help="Number of recommendations to output. By default - 8")
+                        help="The number of recommendations to output. By default is 8")
     args = parser.parse_args()
 
-    with open(args.db_file, encoding='utf-8') as file:
+    with open(args.db_file, encoding="utf-8") as file:
         films = json.load(file)
 
-    desired_title = input("Enter film to search for: ")
+    desired_title = input("Enter a film title to search for: ")
     try:
         user_film = next(filter(lambda film: film["original_title"] == desired_title, films))
     except StopIteration:
-        print('No such film in FilmsDB')
+        print("No such film in FilmsDB")
         return
 
     recommendations = get_recommendations(user_film, films)
@@ -57,5 +57,5 @@ def main():
         print(f"{index + 1}) {recommendation[0]} - matching {recommendation[1] / max_points:.0%}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
