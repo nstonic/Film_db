@@ -47,12 +47,10 @@ def main():
 
     print("Please, wait, this operation may take about 15-20 minutes")
     with open(args.db_file, "w", encoding="utf-8") as db_file:
-        json.dump(
-            load_films(api_key, args.films_limit),
-            db_file,
-            ensure_ascii=False,
-            indent=4
-        )
+        json.dump(load_films(api_key, args.films_limit),
+                  db_file,
+                  ensure_ascii=False,
+                  indent=4)
 
 
 if __name__ == "__main__":
