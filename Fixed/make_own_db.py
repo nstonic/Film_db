@@ -1,35 +1,59 @@
 import json
+import os
+
+import requests
+from argparse import ArgumentParser
 from dotenv import load_dotenv
-import urllib.request
-import urllib.parse
-from tmdb_helpers import get_user_api_key
-from tmdb_helpers import make_tmdb_api_request
 
 
-def load_films(user_api_key, films_amount=1000):
+def load_films(api_key: str, films_limit: int) -> list[dict]:
     all_films = []
-    for film_id in range(films_amount):
-        try:
-            all_films.append(make_tmdb_api_request(method='/movie/%d' % film_id, api_key=user_api_key))
-        except urllib.error.HTTPError as err:
-            if err.code == 404:  # if no film on this id
-                continue
-            else:
-                raise
-        finally:
-            print('%s percent complete' % str(film_id * 100 / films_amount))
-    return all_films
+    params = {
+        "api_key": api_key,
+        "language": "ru",
+    }
+    film_id = total_films = 0
+    while True:
+        url = f"https://api.themoviedb.org/3/movie/{film_id}"
+        response = requests.get(url, params=params)
+        if response.status_code == 401:
+            raise requests.exceptions.HTTPError(response.json()["status_message"])
+        elif response.status_code == 404:
+            film_id += 1
+            continue
+        response.raise_for_status()
+
+        all_films.append(response.json())
+        film_id += 1
+        total_films += 1
+        if total_films == films_limit:
+            return all_films
 
 
-if __name__ == '__main__':
+def main():
     load_dotenv()
+    api_key = os.environ["TMDB_API_KEY"]
+    parser = ArgumentParser()
+    parser.add_argument("--FilmsLimit",
+                        dest="films_limit",
+                        type=int,
+                        default=1000,
+                        help="A number of films to load. By default is 1000.")
+    parser.add_argument("--FilmsDB",
+                        dest="db_file",
+                        default="MyFilmDB.json",
+                        help="The path to the movie database file for saving to. By default is MyFilmDB.json")
+    args = parser.parse_args()
 
-    user_api_key = get_user_api_key()
-    if not user_api_key:
-        print('Invalid api key')
-        raise SystemExit
-    films_amount = 1000
-    print('please, wait, this operation may take smth like 15-20 minutes')
-    all_films = load_films(user_api_key, films_amount)
-    with open('MyFilmDB.json', 'w', encoding='utf-8') as my_file:
-        json.dump(all_films, my_file)
+    print("Please, wait, this operation may take about 15-20 minutes")
+    with open(args.db_file, "w", encoding="utf-8") as db_file:
+        json.dump(
+            load_films(api_key, args.films_limit),
+            db_file,
+            ensure_ascii=False,
+            indent=4
+        )
+
+
+if __name__ == "__main__":
+    main()
