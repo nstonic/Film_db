@@ -45,7 +45,7 @@ def main():
                         help="The path to the movie database file for saving to. By default is MyFilmDB.json")
     args = parser.parse_args()
 
-    print("Please, wait, this operation may take about 15-20 minutes")
+    print("Please wait. This operation may take about 15-20 minutes")
     with open(args.db_file, "w", encoding="utf-8") as db_file:
         json.dump(load_films(api_key, args.films_limit),
                   db_file,
