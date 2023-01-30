@@ -1,6 +1,6 @@
 # Выбираем фильм
 
-Библиотека для работы с базой данных фильмов сайта [thewoviedb.org](https://thewoviedb.org)
+Библиотека для работы с базой данных фильмов сайта [themoviedb.org](https://themoviedb.org)
 Состоит из 6 модулей.
 
 - find_similar.py
@@ -16,7 +16,7 @@
 
 ## Модуль make_own_db.py
 
-Производит загрузку данных по api с сайта [thewoviedb.org](https://thewoviedb.org).
+Производит загрузку данных по api с сайта [themoviedb.org](https://themoviedb.org).
 
 ### Блок if \_\_name__ == '\_\_main__':
 
