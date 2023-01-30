@@ -48,7 +48,7 @@ def main():
     try:
         user_film = next(filter(lambda film: film["original_title"] == desired_title, films))
     except StopIteration:
-        print("No such film in FilmsDB")
+        print(f"No such film in {args.db_file}")
         return
 
     recommendations = get_recommendations(user_film, films)

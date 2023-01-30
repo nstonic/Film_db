@@ -14,7 +14,7 @@ def main():
         films = json.load(file)
 
     keyword = input("Enter a keyword to search for: ")
-    founded_films = list(filter(lambda film: keyword in film["original_title"], films))
+    founded_films = filter(lambda film: keyword in film["original_title"], films)
     for film in founded_films:
         print(film["original_title"])
 
